@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 contract Timelock {
-    error NotOwnerError();
+    error NotOwnerError(); // pending
     error AlreadyQueuedError(bytes32 txId);
     address owner;
     mapping(bytes32 => bool) public queued;
