@@ -5,6 +5,19 @@ contract Timelock {
     error NotOwnerError(); // pending
     error AlreadyQueuedError(bytes32 txId);
     error TimestampNotInRangeError(bytes32 blockTimestamp, uint timestamp);
+    error NotQueuedError(bytes32 txId);
+    error TimestampNotPassedError(bytes32 blockTimestamp, uint timestamp);
+    error TimestampExpiredError(bytes32 blockTimestamp, uint expiresAt);
+    error TxFailedError();
+
+    event Execute (
+        bytes32 indexed txId,
+        address indexed target,
+        uint value,
+        string func,
+        bytes data,
+        uint timestamp 
+    );
 
     event Queue (
         bytes32 indexed txId,
@@ -16,6 +29,7 @@ contract Timelock {
     );
     uint public constant MIN_DELAY = 10;
     uint public constant MAX_DELAY = 1000;
+    uint public constant GRACE_PERIOD = 1000;
     address owner;
     mapping(bytes32 => bool) public queued;
     constructor() {
@@ -80,10 +94,34 @@ contract Timelock {
     ) external payable OnlyOwner returns(bytes memory) {
         bytes32 txId = getTxId(_target, _value, _func, _data, _timestamp);
         // check if tx is queued
+        if(!queued[txId]) {
+            revert NotQueuedError(txId);
+        }
         // check if block.timestamp > _timestamp
+        if (block.timestamp < _timestamp){
+            revert TimestampNotPassedError(block.timestamp, _timestamp);
+        }
+        if (block.timestamp > _timestamp + GRACE_PERIOD){
+            revert TimestampExpiredError(block.timestamp, _timestamp + GRACE_PERIOD);
+        }
         //delete the transaction from the queue
+        queued[txId] = false;
         // execute the tx
-
+        bytes memory data;
+        if(bytes(_func).length > 0){
+            data = abi.encodePacked(bytes4(keccak256(bytes(_func))), _data
+            );
+        } else {
+            data = _data;
+        }
+        (bool ok, bytes memory res) = _target.call{value: _value}(data);
+        if(!ok) {
+            revert TxFailedError();
+        }
+        emit Execute (
+            txId, _target, _value, _func, _data, _timestamp
+        );
+        return res;
     }
 
 }
