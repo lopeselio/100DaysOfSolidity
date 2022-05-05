@@ -4,6 +4,18 @@ pragma solidity ^0.8.13;
 contract Timelock {
     error NotOwnerError(); // pending
     error AlreadyQueuedError(bytes32 txId);
+    error TimestampNotInRangeError(bytes32 blockTimestamp, uint timestamp);
+
+    event Queue (
+        bytes32 indexed txId,
+        address indexed target,
+        uint value,
+        string func,
+        bytes data,
+        uint timestamp
+    );
+    uint public constant MIN_DELAY = 10;
+    uint public constant MAX_DELAY = 1000;
     address owner;
     mapping(bytes32 => bool) public queued;
     constructor() {
@@ -42,7 +54,18 @@ contract Timelock {
             revert AlreadyQueuedError(txId);
         }
         // check timestamp
+        if(
+            _timestamp < block.timestamp + MIN_DELAY ||
+            _timestamp > block.timestamp + MAX_DELAY
+        ) {
+            revert TimestampNotInRangeError(block.timestamp, _timestamp);
+        }
         // queue tx
+        queued[txId] = true;
+
+        emit Queue (
+            txId, _target, _value, _func, _data, _timestamp
+        );
     }
     function execute() external {}
 
