@@ -22,6 +22,10 @@ contract Timelock {
         owner = msg.sender;
     }
 
+    receive() external payable {
+
+    } 
+
     modifier OnlyOwner() {
         if(msg.sender != owner) {
             revert NotOwnerError();
@@ -67,7 +71,20 @@ contract Timelock {
             txId, _target, _value, _func, _data, _timestamp
         );
     }
-    function execute() external {}
+    function execute(
+        address _target,
+        uint _value,
+        string calldata _func,
+        bytes calldata _data,
+        uint _timestamp
+    ) external payable OnlyOwner returns(bytes memory) {
+        bytes32 txId = getTxId(_target, _value, _func, _data, _timestamp);
+        // check if tx is queued
+        // check if block.timestamp > _timestamp
+        //delete the transaction from the queue
+        // execute the tx
+
+    }
 
 }
 
