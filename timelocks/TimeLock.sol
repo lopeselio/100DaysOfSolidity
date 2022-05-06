@@ -152,6 +152,9 @@ contract TestTimeLock {
         timeLock = _timeLock;
     }
     function test() external {
-        require(msg.sender == timeLock);
+        require(msg.sender == timeLock, "not timelock");    
+    }
+    function getTimeStamp() external view returns (uint) {
+        return block.timestamp + 100;
     }
 }
