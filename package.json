@@ -1,0 +1,22 @@
+{
+  "name": "100daysofsolidity",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lopeselio/100DaysOfSolidity.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lopeselio/100DaysOfSolidity/issues"
+  },
+  "homepage": "https://github.com/lopeselio/100DaysOfSolidity#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.6.0"
+  }
+}
