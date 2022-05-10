@@ -63,6 +63,8 @@ contract NFTeeStaker is ERC20 {
             user.stakedNFTs.push(tokenIds[i]);
 
         }
+        accumulate(msg.sender);
+        user.currYield = yield;
     }
 
     function unstake() public {
@@ -70,6 +72,10 @@ contract NFTeeStaker is ERC20 {
     }
 
     function claim() public {
+
+    }
+
+    function accumulate(address staker) internal {
 
     }
 
