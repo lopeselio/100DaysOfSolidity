@@ -35,7 +35,7 @@ contract NFTeeStaker is ERC20 {
         uint256[] stakedNFTs; 
     }
     mapping(address => Staker) public stakers;
-
+    mapping(uint256 => address) public tokenOwners;
     constructor(
         address _nftContract, 
         string memory name, 
@@ -44,12 +44,33 @@ contract NFTeeStaker is ERC20 {
         nftContract = IERC721(_nftContract);
     }
 
-    function stake() public {
+    function stake(uint256[] memory tokenIds) public {
+        Staker storage user = stakers[msg.sender];
+        uint256 yield = user.currYield;
+        uint256 length = tokenIds.length;
+        for(uint256 i=0; i<length; i++) {
+            require(
+                nftContract.ownerOf(tokenIds[i]) == msg.sender, 
+                "Not an owner"
+            );
+            nftContract.safeTransferFrom(
+                msg.sender, 
+                address(this), 
+                tokenIds[i]
+            );
+            tokenOwners[tokenIds[i]] = msg.sender;
+            yield += BASE_YIELD_RATE;
+            user.stakedNFTs.push(tokenIds[i]);
 
+        }
     }
 
     function unstake() public {
-        
+
+    }
+
+    function claim() public {
+
     }
 
 }
