@@ -36,7 +36,19 @@ contract NFTeeStaker is ERC20 {
     }
     mapping(address => Staker) public stakers;
 
-    constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+    constructor(
+        address _nftContract, 
+        string memory name, 
+        string memory symbol
+    ) ERC20(name, symbol) {
+        nftContract = IERC721(_nftContract);
+    }
+
+    function stake() public {
+
+    }
+
+    function unstake() public {
         
     }
 
