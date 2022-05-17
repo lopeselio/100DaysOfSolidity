@@ -76,7 +76,17 @@ contract NFTeeStaker is ERC20 {
     }
 
     function accumulate(address staker) internal {
+        stakers[staker].lastCheckpoint = block.timestamp;
+        stakers[staker].rewards += getRewards(staker);
+    }
 
+    function getRewards(address staker) public view returns (uint256) {
+        Staker memory user = stakers[staker];
+        if(user.lastCheckpoint == 0) {
+            return 0;
+        }
+
+        return ((block.timestamp - user.lastCheckpoint) * user.currYield)/SECONDS_PER_DAY;
     }
 
 }
